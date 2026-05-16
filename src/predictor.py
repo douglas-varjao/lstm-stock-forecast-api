@@ -11,7 +11,7 @@ import joblib
 import tensorflow as tf
 import numpy as np
 from flask import Blueprint, request, jsonify
-from src.auth import auth
+from auth import auth
 
 predictor_blueprint = Blueprint('predictor', __name__)
 
@@ -36,6 +36,29 @@ except Exception as e:
 @predictor_blueprint.route('/predict', methods=['POST'])
 @auth.login_required
 def predict():
+    """
+    Realiza a previsão do preço da ação PETR4.SA
+    ---
+    tags:
+      - Predição LSTM
+    description: Envie uma lista com os últimos 60 preços de fechamento para prever o próximo dia.
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: array
+          items:
+            type: number
+          example: [25.4, 25.6, 25.8, 26.0, 26.1, 26.3, 26.5, 26.7, 26.9, 27.0, 27.1, 27.3, 27.5, 27.6, 27.8, 28.0, 28.1, 28.3, 28.5, 28.6, 28.8, 29.0, 29.1, 29.3, 29.5, 29.6, 29.8, 30.0, 30.1, 30.3, 30.5, 30.6, 30.8, 31.0, 31.1, 31.3, 31.5, 31.6, 31.8, 32.0, 32.1, 32.3, 32.5, 32.6, 32.8, 33.0, 33.1, 33.3, 33.5, 33.6, 33.8, 34.0, 34.1, 34.3, 34.5, 34.6, 34.8, 35.0, 35.1, 35.3]
+    responses:
+      200:
+        description: Previsão realizada com sucesso.
+      401:
+        description: Não autorizado - Usuário ou senha incorretos.
+      400:
+        description: Erro nos dados enviados (ex. quantidade diferente de 60).
+    """
     if model is None or scaler is None:
         return jsonify({"error": "Modelo ou scaler não disponível. Treine o modelo primeiro."}), 500
     

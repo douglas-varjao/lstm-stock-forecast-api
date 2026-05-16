@@ -6,5 +6,9 @@ scikit-learn
 tensorflow
 yfinance
 joblib
-fastapi
 uvicorn
+Flask
+flasgger
+Flask-HTTPAuth
+fastapi
+python-dotenv
