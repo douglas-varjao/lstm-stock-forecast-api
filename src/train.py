@@ -4,8 +4,10 @@ import pandas as pd
 import numpy as np
 import joblib
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.metrics import mean_squared_error, mean_absolute_error
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout
+
 
 
 #====== Config ======#
@@ -63,7 +65,22 @@ def train_model():
     print("Treinando o modelo...")
     model.fit(x_train, y_train, epochs=25, batch_size=32, verbose=1, shuffle=False)
 
-    #salvamento de artefatos
+    #Calculo de métricas de avaliação
+    print("Calculando métricas de avaliação...")
+    predictions = model.predict(x_train, verbose=0)
+    predictions_rescaled = scaler.inverse_transform(predictions)
+    y_train_rescaled = scaler.inverse_transform(y_train.reshape(-1, 1))
+
+    mae = mean_absolute_error(y_train_rescaled, predictions_rescaled)
+    rmse = np.sqrt(mean_squared_error(y_train_rescaled, predictions_rescaled))
+    mape = np.mean(np.abs((y_train_rescaled - predictions_rescaled) / y_train_rescaled)) * 100
+
+    print(f"=== Métricas de performance ===")
+    print((f"MAE:{mae:.2f}"))
+    print((f"RMSE:{rmse:.2f}"))
+    print((f"MAPE:{mape:.2f}%"))
+
+      #salvamento de artefatos
     print("salvando modelo e scaler...")
     model.save(MODEL_PATH)
     joblib.dump(scaler, SCALER_PATH)
